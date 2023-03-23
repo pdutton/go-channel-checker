@@ -11,7 +11,7 @@ type channelCheckerImpl[T comparable] struct {
 	ch chan T
 
 	expectationMutex sync.RWMutex
-	expectations []*expectation[T]
+	expectations []Expectation[T]
 
 	ctxt context.Context
 	cancel context.CancelFunc
@@ -68,13 +68,14 @@ func (cc *channelCheckerImpl[T]) verifyExpected(val T) {
 
 }
 
-func (cc *channelCheckerImpl[T]) Expect(val T) {
+func (cc *channelCheckerImpl[T]) Expect(val T) Expectation[T] {
 	cc.expectationMutex.Lock()
 	defer cc.expectationMutex.Unlock()
 
-	var expect = newExpectation(val, 1)
+	var expect = newExpectation(val)
 	cc.expectations = append(cc.expectations, expect)
 
+    return expect
 }
 
 func (cc *channelCheckerImpl[T]) Check() {
@@ -86,7 +87,7 @@ func (cc *channelCheckerImpl[T]) Check() {
 
 	for _, e := range cc.expectations {
 		if !e.isSatisfied() {
-			cc.t.Errorf(`expected to receive %s on channel`, e.expectedValue)
+			cc.t.Error(e.String())
 		}
 	}
 
