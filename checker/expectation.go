@@ -4,14 +4,12 @@ import (
     "fmt"
 )
 
-const (
-    ONE_OR_MORE_TIMES  = -1
-    ZERO_OR_MORE_TIMES = -2
-)
+const UNBOUNDED = -1
 
 type expectation[T comparable] struct {
 	expectedValue T
-	expectedCount int
+    minCount int
+    maxCount int
 	actualCount int
     after Expectation[T]
 }
@@ -19,22 +17,36 @@ type expectation[T comparable] struct {
 func newExpectation[T comparable](val T) Expectation[T] {
 	return &expectation[T]{
 		expectedValue: val,
-		expectedCount: 1,
+        minCount: 1,
+        maxCount: 1,
 	}
 }
 
 func (e *expectation[T]) Times(nbr int) Expectation[T] {
-    e.expectedCount = nbr
+    e.minCount = nbr
+    e.maxCount = nbr
+
+    return e
+}
+
+func (e *expectation[T]) Between(min, max int) Expectation[T] {
+    e.minCount = min
+    e.maxCount = max
+
     return e
 }
 
 func (e *expectation[T]) AtLeastOnce() Expectation[T] {
-    e.expectedCount = ONE_OR_MORE_TIMES
+    e.minCount = 1
+    e.maxCount = UNBOUNDED
+
     return e
 }
 
 func (e *expectation[T]) AnyTimes() Expectation[T] {
-    e.expectedCount = ZERO_OR_MORE_TIMES
+    e.minCount = 0
+    e.maxCount = UNBOUNDED
+
     return e
 }
 
@@ -45,8 +57,8 @@ func (e *expectation[T]) After(other Expectation[T]) Expectation[T] {
 }
 
 func (e *expectation[T]) matches(val T) bool {
-	if e.expectedCount >= 0 && 
-       e.expectedCount <= e.actualCount {
+	if e.maxCount != UNBOUNDED && 
+       e.maxCount <= e.actualCount {
 		return false
 	}
 
@@ -61,19 +73,11 @@ func (e *expectation[T]) matches(val T) bool {
 
 func (e *expectation[T]) isSatisfied() bool {
 
-    if e.expectedCount == ZERO_OR_MORE_TIMES {
+    if e.minCount == 0 {
         return true
     }
 
-    if e.expectedCount == ONE_OR_MORE_TIMES {
-        return (e.actualCount > 0) 
-    }
-
-	if e.actualCount == e.expectedCount {
-		return true
-	}
-
-	return false
+    return (e.actualCount >= e.minCount)
 }
 
 func (e *expectation[T]) String() string {

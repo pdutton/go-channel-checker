@@ -11,9 +11,12 @@ type ChannelChecker[T comparable] interface {
 
 type Expectation[T comparable] interface {
     fmt.Stringer
+
     Times(int) Expectation[T]
+    Between(int, int) Expectation[T]
     AtLeastOnce() Expectation[T]
     AnyTimes() Expectation[T]
+
     After(Expectation[T]) Expectation[T]
     matches(T) bool
     isSatisfied() bool

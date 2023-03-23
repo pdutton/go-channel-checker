@@ -12,14 +12,12 @@ func TestNewExpectationTimes_string(t *testing.T) {
     }{
         { `red`, 1 },
         { `orange`, 3 },
-        { `yellow`, ONE_OR_MORE_TIMES },
-        { `green`, ZERO_OR_MORE_TIMES },
     }
 
     for _, test := range tests {
         t.Run(test.val, func(t *testing.T) {
             t.Parallel()
-            subtest(t, test.val, test.nbr)
+            subtestTimes(t, test.val, test.nbr)
         })
     }
 }
@@ -31,27 +29,69 @@ func TestNewExpectationTimes_int(t *testing.T) {
     }{
         { 9, 1 },
         { 3, 3 },
-        { 4, ONE_OR_MORE_TIMES },
-        { 6, ZERO_OR_MORE_TIMES },
     }
 
     for _, test := range tests {
         t.Run(strconv.Itoa(test.val), func(t *testing.T) {
             t.Parallel()
-            subtest(t, test.val, test.nbr)
+            subtestTimes(t, test.val, test.nbr)
         })
     }
 }
 
-func subtest[T comparable](t *testing.T, val T, nbr int) {
+func subtestTimes[T comparable](t *testing.T, val T, nbr int) {
     var impl = newExpectation(val).Times(nbr).(*expectation[T])
 
     if impl.expectedValue != val {
         t.Errorf(`unexpected val: %v`, impl.expectedValue)
     }
 
-    if impl.expectedCount != nbr {
-        t.Errorf(`unexpected count: %d`, impl.expectedCount)
+    if impl.minCount != nbr {
+        t.Errorf(`unexpected min count: %d`, impl.minCount)
+    }
+
+    if impl.maxCount != nbr {
+        t.Errorf(`unexpected max count: %d`, impl.maxCount)
+    }
+
+    if impl.actualCount != 0 {
+        t.Errorf(`unexpected actual count: %d`, impl.actualCount)
+    }
+}
+
+func TestNewExpectationBetween(t *testing.T) {
+    var tests = []struct{
+        val string
+        min int
+        max int
+    }{
+        { `red`, 1, 2 },
+        { `orange`, 2, 5 },
+        { `yellow`, 0, 55 },
+        { `green`, 4, 55 },
+    }
+
+    for _, test := range tests {
+        t.Run(test.val, func(t *testing.T) {
+            t.Parallel()
+            subtestBetween(t, test.val, test.min, test.max)
+        })
+    }
+}
+
+func subtestBetween[T comparable](t *testing.T, val T, min int, max int) {
+    var impl = newExpectation(val).Between(min, max).(*expectation[T])
+
+    if impl.expectedValue != val {
+        t.Errorf(`unexpected val: %v`, impl.expectedValue)
+    }
+
+    if impl.minCount != min {
+        t.Errorf(`unexpected min count: %d`, impl.minCount)
+    }
+
+    if impl.maxCount != max {
+        t.Errorf(`unexpected max count: %d`, impl.maxCount)
     }
 
     if impl.actualCount != 0 {
@@ -67,8 +107,12 @@ func TestExpectationAtLeastOnce(t *testing.T) {
         t.Errorf(`unexpected val: %v`, impl.expectedValue)
     }
 
-    if impl.expectedCount != ONE_OR_MORE_TIMES {
-        t.Errorf(`unexpected count: %d`, impl.expectedCount)
+    if impl.minCount != 1 {
+        t.Errorf(`unexpected min count: %d`, impl.minCount)
+    }
+
+    if impl.maxCount != UNBOUNDED {
+        t.Errorf(`unexpected max count: %d`, impl.maxCount)
     }
 
     if impl.actualCount != 0 {
@@ -84,13 +128,16 @@ func TestExpectationAnyTimes(t *testing.T) {
         t.Errorf(`unexpected val: %v`, impl.expectedValue)
     }
 
-    if impl.expectedCount != ZERO_OR_MORE_TIMES {
-        t.Errorf(`unexpected count: %d`, impl.expectedCount)
+    if impl.minCount != 0 {
+        t.Errorf(`unexpected min count: %d`, impl.minCount)
+    }
+
+    if impl.maxCount != UNBOUNDED {
+        t.Errorf(`unexpected max count: %d`, impl.maxCount)
     }
 
     if impl.actualCount != 0 {
         t.Errorf(`unexpected actual count: %d`, impl.actualCount)
     }
 }
-
 

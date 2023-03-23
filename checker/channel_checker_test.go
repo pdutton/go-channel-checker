@@ -306,3 +306,80 @@ func TestChannelChecker_2a2b2a(t *testing.T) {
 	cc.Check()
 }
 
+func TestChannelChecker_between_1(t *testing.T) {
+	var mc = gomock.NewController(t)
+	var mt = NewMocktIntf(mc)
+	var ch = make(chan string)
+    var val = `violet`
+
+	mt.EXPECT().Cleanup(gomock.Any())
+    mt.EXPECT().Error(gomock.Any())
+
+	var cc = NewChannelChecker(mt, ch)
+
+	cc.Expect(val).Between(2, 3)
+
+	ch<-val
+
+	cc.Check()
+} 
+
+func TestChannelChecker_between_2(t *testing.T) {
+	var mc = gomock.NewController(t)
+	var mt = NewMocktIntf(mc)
+	var ch = make(chan string)
+    var val = `violet`
+
+	mt.EXPECT().Cleanup(gomock.Any())
+
+	var cc = NewChannelChecker(mt, ch)
+
+	cc.Expect(val).Between(2, 3)
+
+	ch<-val
+	ch<-val
+
+	cc.Check()
+} 
+
+func TestChannelChecker_between_3(t *testing.T) {
+	var mc = gomock.NewController(t)
+	var mt = NewMocktIntf(mc)
+	var ch = make(chan string)
+    var val = `violet`
+
+	mt.EXPECT().Cleanup(gomock.Any())
+
+	var cc = NewChannelChecker(mt, ch)
+
+	cc.Expect(val).Between(2, 3)
+
+	ch<-val
+	ch<-val
+	ch<-val
+
+	cc.Check()
+} 
+
+func TestChannelChecker_between_4(t *testing.T) {
+	var mc = gomock.NewController(t)
+	var mt = NewMocktIntf(mc)
+	var ch = make(chan string)
+    var val = `violet`
+
+	mt.EXPECT().Cleanup(gomock.Any())
+    mt.EXPECT().Errorf(gomock.Any(), val)
+
+	var cc = NewChannelChecker(mt, ch)
+
+	cc.Expect(val).Between(2, 3)
+
+	ch<-val
+	ch<-val
+	ch<-val
+	ch<-val
+
+	cc.Check()
+} 
+
+
