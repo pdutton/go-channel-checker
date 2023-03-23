@@ -1,7 +1,7 @@
 package checker
 
-type ChannelChecker interface {
-	Expect(string)
+type ChannelChecker[T any] interface {
+	Expect(T)
 	Check()
 }
 

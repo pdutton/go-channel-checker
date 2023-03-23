@@ -1,6 +1,6 @@
 package checker
 
-type T interface {
+type tIntf interface {
 	Cleanup(func())
 	Error(args ...any)
 	Errorf(format string, args ...any)

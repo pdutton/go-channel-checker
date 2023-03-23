@@ -2,27 +2,26 @@ package checker
 
 import (
 	"context"
-	"fmt"
 	"sync"
 )
 
-type channelCheckerImpl struct {
-	t T	
+type channelCheckerImpl[T comparable] struct {
+	t tIntf
 
-	ch chan string	
+	ch chan T
 
 	expectationMutex sync.RWMutex
-	expectations []*expectation
+	expectations []*expectation[T]
 
 	ctxt context.Context
 	cancel context.CancelFunc
 	wg sync.WaitGroup
 }
 
-func NewChannelChecker(t T, ch chan string) ChannelChecker {
+func NewChannelChecker[T comparable](t tIntf, ch chan T) ChannelChecker[T] {
 	ctxt, cancel := context.WithCancel(context.Background())
 
-	var ccp = &channelCheckerImpl{
+	var ccp = &channelCheckerImpl[T]{
 		t: t,
 
 		ch: ch,
@@ -38,7 +37,7 @@ func NewChannelChecker(t T, ch chan string) ChannelChecker {
 	return ccp
 }
 
-func (cc *channelCheckerImpl) run() {
+func (cc *channelCheckerImpl[T]) run() {
 	cc.wg.Add(1)
 	defer cc.wg.Done()
 
@@ -50,20 +49,17 @@ func (cc *channelCheckerImpl) run() {
 			if !ok {
 				return
 			}
-			fmt.Println(`receive`)
 			cc.verifyExpected(val)
 		}
 	}
 }
 
-func (cc *channelCheckerImpl) verifyExpected(val string) {
+func (cc *channelCheckerImpl[T]) verifyExpected(val T) {
 	cc.expectationMutex.RLock()
 	defer cc.expectationMutex.RUnlock()
 
-	fmt.Println(`verifying`)
 	for _, e := range cc.expectations {
 		if e.matches(val) {
-			fmt.Println(`match found`)
 			return
 		}
 	}
@@ -72,7 +68,7 @@ func (cc *channelCheckerImpl) verifyExpected(val string) {
 
 }
 
-func (cc *channelCheckerImpl) Expect(val string) {
+func (cc *channelCheckerImpl[T]) Expect(val T) {
 	cc.expectationMutex.Lock()
 	defer cc.expectationMutex.Unlock()
 
@@ -81,14 +77,12 @@ func (cc *channelCheckerImpl) Expect(val string) {
 
 }
 
-func (cc *channelCheckerImpl) Check() {
+func (cc *channelCheckerImpl[T]) Check() {
 	cc.cancel()
 	cc.wg.Wait()
 
 	cc.expectationMutex.RLock()
 	defer cc.expectationMutex.RUnlock()
-
-	fmt.Println(`checking`)
 
 	for _, e := range cc.expectations {
 		if !e.isSatisfied() {

@@ -7,7 +7,7 @@ import (
 
 func TestChannelChecker_noExpectations_noSends(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 
 	mt.EXPECT().Cleanup(gomock.Any())
@@ -19,7 +19,7 @@ func TestChannelChecker_noExpectations_noSends(t *testing.T) {
 
 func TestChannelChecker_noExpectations_oneSends(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var val = `hi`
 
@@ -35,7 +35,7 @@ func TestChannelChecker_noExpectations_oneSends(t *testing.T) {
 
 func TestChannelChecker_oneExpectation_noSends(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var val = `hi`
 
@@ -51,7 +51,7 @@ func TestChannelChecker_oneExpectation_noSends(t *testing.T) {
 
 func TestChannelChecker_dupSend(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var val = `hi`
 
@@ -70,7 +70,7 @@ func TestChannelChecker_dupSend(t *testing.T) {
 
 func TestChannelChecker_dupExpect(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var val = `hi`
 
@@ -89,7 +89,7 @@ func TestChannelChecker_dupExpect(t *testing.T) {
 
 func TestChannelChecker_oneExpectation_oneSend(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var val = `hi`
 
@@ -106,7 +106,7 @@ func TestChannelChecker_oneExpectation_oneSend(t *testing.T) {
 
 func TestChannelChecker_many_success_ordered(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var values = []string{`alpha`, `beta`, `delta`, `gamma`, `eplison`}
 
@@ -127,7 +127,7 @@ func TestChannelChecker_many_success_ordered(t *testing.T) {
 
 func TestChannelChecker_many_success_disordered(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var values = []string{`alpha`, `beta`, `delta`, `gamma`, `eplison`}
 
@@ -152,7 +152,7 @@ func TestChannelChecker_many_success_disordered(t *testing.T) {
 
 func TestChannelChecker_many_someProblems(t *testing.T) {
 	var mc = gomock.NewController(t)
-	var mt = NewMockT(mc)
+	var mt = NewMocktIntf(mc)
 	var ch = make(chan string)
 	var values = []string{`alpha`, `beta`, `delta`, `gamma`, `eplison`}
 
