@@ -4,14 +4,15 @@ Channel Checker for Go
 ## Features
 
 Allows adding read expectations for a channel.
-Uses generics so the channel type can be anything comparable.
+    - Uses generics so the channel type can be anything comparable.
+    - Add ability to expect/match more than one instance.
+    - Add order checking.
 
 ## Usage
 
 *Coming soon*.
 
 ## TODO
-    I plan to add the following:
-    - Add ability to expect/match more than one instance.
-    - Add ordering.
+
+    - Document
 

@@ -382,4 +382,46 @@ func TestChannelChecker_between_4(t *testing.T) {
 	cc.Check()
 } 
 
+func TestChannelChecker_after_yes(t *testing.T) {
+	var mc = gomock.NewController(t)
+	var mt = NewMocktIntf(mc)
+	var ch = make(chan string)
+    var val1 = `blue`
+    var val2 = `violet`
+
+	mt.EXPECT().Cleanup(gomock.Any())
+
+	var cc = NewChannelChecker(mt, ch)
+
+	var e1 = cc.Expect(val1)
+	cc.Expect(val2).After(e1)
+
+	ch<-val1
+	ch<-val2
+
+	cc.Check()
+} 
+
+func TestChannelChecker_after_no(t *testing.T) {
+	var mc = gomock.NewController(t)
+	var mt = NewMocktIntf(mc)
+	var ch = make(chan string)
+    var val1 = `blue`
+    var val2 = `violet`
+
+	mt.EXPECT().Cleanup(gomock.Any())
+    mt.EXPECT().Error(gomock.Any())
+    mt.EXPECT().Errorf(gomock.Any(), val2)
+
+	var cc = NewChannelChecker(mt, ch)
+
+	var e1 = cc.Expect(val1)
+	cc.Expect(val2).After(e1)
+
+	ch<-val2
+	ch<-val1
+
+	cc.Check()
+} 
+
 

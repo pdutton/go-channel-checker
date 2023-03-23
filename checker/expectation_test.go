@@ -141,3 +141,28 @@ func TestExpectationAnyTimes(t *testing.T) {
     }
 }
 
+func TestExpectation_matches_after_true(t *testing.T) {
+    var val1 = `red`
+    var val2 = `orange`
+
+    var e1 = newExpectation(val1).AnyTimes()
+    var e2 = newExpectation(val2).After(e1)
+
+    if !e2.matches(val2) {
+        t.Error(`expected match`)
+    }
+}
+
+func TestExpectation_matches_after_false(t *testing.T) {
+    var val1 = `red`
+    var val2 = `orange`
+
+    var e1 = newExpectation(val1)
+    var e2 = newExpectation(val2).After(e1)
+
+    if e2.matches(val2) {
+        t.Error(`unexpected match`)
+    }
+}
+
+

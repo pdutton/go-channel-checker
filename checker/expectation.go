@@ -57,6 +57,10 @@ func (e *expectation[T]) After(other Expectation[T]) Expectation[T] {
 }
 
 func (e *expectation[T]) matches(val T) bool {
+    if e.after != nil && !e.after.isSatisfied() {
+        return false
+    }
+    
 	if e.maxCount != UNBOUNDED && 
        e.maxCount <= e.actualCount {
 		return false
