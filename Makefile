@@ -4,12 +4,12 @@ GO?=go
 MOCKGEN?=mockgen
 
 build: unit_test
-generate: mock/mock_testing.go
+generate: checker/T_mock_test.go
 mockgen: $(GO) install github.com/golang/mock/mockgen
 	
-mock/mock_testing.go: 
-	$(MOCKGEN) -destination $@ -package mock testing TB
+checker/T_mock_test.go: checker/T.go
+	$(MOCKGEN) -source=$< -destination $@ -package checker
 
 unit_test: 
-	$(GO) test -cover 
+	$(GO) test -cover ./checker
 

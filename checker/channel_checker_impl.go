@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"testing"
 )
 
 type channelCheckerImpl struct {
-	t testing.TB
+	t T	
 
 	ch chan string	
 
@@ -20,7 +19,7 @@ type channelCheckerImpl struct {
 	wg sync.WaitGroup
 }
 
-func NewChannelChecker(t *testing.T, ch chan string) ChannelChecker {
+func NewChannelChecker(t T, ch chan string) ChannelChecker {
 	ctxt, cancel := context.WithCancel(context.Background())
 
 	var ccp = &channelCheckerImpl{
@@ -32,7 +31,7 @@ func NewChannelChecker(t *testing.T, ch chan string) ChannelChecker {
 		cancel: cancel,
 	}
 
-	t.Cleanup(func() { ccp.Check() })
+	t.Cleanup(ccp.Check)
 
 	go ccp.run()
 
