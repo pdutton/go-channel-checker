@@ -1,4 +1,9 @@
 # go-channel-checker
+
+**This repo is no longer maintained.**
+
+---
+
 Channel Checker for Go
 
 ## Features
